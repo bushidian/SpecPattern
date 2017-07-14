@@ -47,6 +47,9 @@ namespace SpecPattern
             // AutoMapper Doc Url https://stackoverflow.com/questions/40275195/how-to-setup-automapper-in-asp-net-core
             services.AddAutoMapper();
 
+            // SignalR 
+            services.AddSignalR(options => options.Hubs.EnableDetailedErrors = true);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +60,8 @@ namespace SpecPattern
             loggerFactory.AddDebug();
 
             app.UseMvc();
+
+            app.UseSignalR();
         }
 
         private void InitDbConnection(IServiceCollection services, DbTypes type)
@@ -77,6 +82,17 @@ namespace SpecPattern
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<IMovieRepository, MovieRepository>();
             services.AddScoped<IMovieManagerService, MovieManagerService>();
+        }
+
+        private void ConfigCors(IApplicationBuilder app)
+        {
+            app.UseCors(
+              builder => builder.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials())
+              .UseStaticFiles()
+              .UseWebSockets();
         }
 
     }
